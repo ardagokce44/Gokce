@@ -255,7 +255,23 @@
     100%{ opacity:1; stroke-dashoffset:0; }
   }
 
-  /* ---------- Secret button + heart canvas ---------- */
+  .secret-balloon{position:absolute;z-index:4;font-size:34px;opacity:0;pointer-events:none;animation:secretFloat 5.8s cubic-bezier(.22,.61,.36,1) forwards;filter:drop-shadow(0 0 5px currentColor);}
+  @keyframes secretFloat{
+    0%{transform:translate3d(0,30px,0) scale(.65) rotate(0deg);opacity:0;}
+    8%{opacity:1;}
+    35%{transform:translate3d(22px,-32vh,0) scale(.95) rotate(8deg);}
+    65%{transform:translate3d(-28px,-68vh,0) scale(.9) rotate(-10deg);}
+    88%{opacity:.65;}
+    100%{transform:translate3d(35px,-115vh,0) scale(.75) rotate(6deg);opacity:0;}
+  }
+  @media (max-width:420px){
+    .title{ font-size:1.1rem; }
+    .happy{ font-size:2.2rem; }
+    .age{ font-size:3.6rem; }
+    .bday{ font-size:2.2rem; }
+    .action-btn{ font-size:0.9rem; padding:9px 18px; }
+  }
+
   .arda-bot-btn{
     position:relative;
     z-index:3;
@@ -289,69 +305,6 @@
   @keyframes botPulse{
     0%,100%{ transform:scale(1) rotate(0deg); }
     50%{ transform:scale(1.15) rotate(-4deg); }
-  }
-
-  .secret-btn{
-    position:relative; z-index:3;
-    margin-top:22px;
-    background:none;
-    border:none;
-    color:#ff78b7;
-    font-size:0.8rem;
-    letter-spacing:0.5px;
-    cursor:pointer;
-    padding:6px 10px;
-    transition:color 0.3s ease;
-  }
-  .secret-btn:hover{
-    color:#ffb3d5;
-  }
-
-  .heart-panel{
-    position:relative; z-index:3;
-    margin-top:10px;
-    display:none;
-    flex-direction:column;
-    align-items:center;
-  }
-  .heart-panel.show{ display:flex; }
-  #heartCanvas{
-    background:
-      radial-gradient(circle at 50% 50%, rgba(255,79,163,0.12), transparent 58%),
-      #000;
-    border-radius:22px;
-    border:1px solid rgba(255,79,163,0.35);
-    box-shadow:
-      0 0 18px rgba(255,79,163,0.25),
-      0 0 55px rgba(255,79,163,0.12),
-      inset 0 0 30px rgba(255,79,163,0.05);
-  }
-
-  .heart-panel{
-    animation: heartReveal 1.2s cubic-bezier(.16,1,.3,1) both;
-  }
-
-  @keyframes heartReveal{
-    from{opacity:0; transform:translateY(18px) scale(.82); filter:blur(8px);}
-    to{opacity:1; transform:translateY(0) scale(1); filter:blur(0);}
-  }
-
-
-  .secret-balloon{position:absolute;z-index:4;font-size:34px;opacity:0;pointer-events:none;animation:secretFloat 5.8s cubic-bezier(.22,.61,.36,1) forwards;filter:drop-shadow(0 0 5px currentColor);}
-  @keyframes secretFloat{
-    0%{transform:translate3d(0,30px,0) scale(.65) rotate(0deg);opacity:0;}
-    8%{opacity:1;}
-    35%{transform:translate3d(22px,-32vh,0) scale(.95) rotate(8deg);}
-    65%{transform:translate3d(-28px,-68vh,0) scale(.9) rotate(-10deg);}
-    88%{opacity:.65;}
-    100%{transform:translate3d(35px,-115vh,0) scale(.75) rotate(6deg);opacity:0;}
-  }
-  @media (max-width:420px){
-    .title{ font-size:1.1rem; }
-    .happy{ font-size:2.2rem; }
-    .age{ font-size:3.6rem; }
-    .bday{ font-size:2.2rem; }
-    .action-btn{ font-size:0.9rem; padding:9px 18px; }
   }
 
   .music-control{position:fixed;top:18px;left:18px;z-index:20;width:46px;height:46px;border:1px solid rgba(61,220,132,.65);border-radius:50%;background:rgba(13,17,23,.78);color:var(--green);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.15rem;box-shadow:0 0 14px rgba(61,220,132,.22);backdrop-filter:blur(6px);transition:transform .25s ease,background .25s ease,box-shadow .25s ease}.music-control:hover{transform:scale(1.08);background:rgba(61,220,132,.14);box-shadow:0 0 22px rgba(61,220,132,.4)}.music-control.off{opacity:.72}@media(max-width:420px){.music-control{top:12px;left:12px;width:42px;height:42px}}
@@ -434,12 +387,6 @@
       <path class="wink-path" id="wf3" d="M62 48 L74 48"/>
       <path class="wink-path" id="wf4" d="M32 62 C40 74 60 74 68 62"/>
     </svg>
-  </div>
-
-  <button class="secret-btn" onclick="toggleSecret()">gizli buton</button>
-
-  <div class="heart-panel" id="heartPanel">
-    <canvas id="heartCanvas" width="280" height="280"></canvas>
   </div>
 
   <button class="arda-bot-btn" id="ardaBotBtn" onclick="toggleArdaBot()">
@@ -562,83 +509,6 @@ function toggleGift(){
   }
 }
 
-/* ================= SECRET BUTTON: TURTLE-STYLE HEART ================= */
-const heartCanvas = document.getElementById('heartCanvas');
-const hctx = heartCanvas.getContext('2d');
-const heartColors = ['#ff4fa3'];
-
-let heartTimer = null;
-let heartIndex = 0;
-const HEART_POINTS = 120;
-
-// parametric heart curve, same shape as the python turtle formula
-function heartPoint(t){
-  const x = 16 * Math.pow(Math.sin(t), 3);
-  const y = 13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t);
-  return {x, y};
-}
-
-function toggleSecret(){
-  const panel = document.getElementById('heartPanel');
-  const willShow = !panel.classList.contains('show');
-  panel.classList.toggle('show');
-
-  if(willShow){
-    startHeartDrawing();
-  } else {
-    stopHeartDrawing();
-  }
-}
-
-function stopHeartDrawing(){
-  if(heartTimer){ clearInterval(heartTimer); heartTimer = null; }
-}
-
-function startHeartDrawing(){
-  stopHeartDrawing();
-  hctx.clearRect(0,0,heartCanvas.width,heartCanvas.height);
-  heartIndex = 0;
-
-  const cx = heartCanvas.width/2;
-  const cy = heartCanvas.height/2;
-  const S = 7;                 // scale factor for the curve
-  const originX = cx;
-  const originY = cy - (40/15)*S;  // matches turtle's t.goto(0,40) origin point
-
-  heartTimer = setInterval(()=>{
-    if(heartIndex >= HEART_POINTS){
-      stopHeartDrawing();
-      return;
-    }
-    const angle = heartIndex * (Math.PI*2 / HEART_POINTS);
-    const p = heartPoint(angle);
-    const px = cx + p.x*S;
-    const py = cy - p.y*S;
-    const color = heartColors[Math.floor(Math.random()*heartColors.length)];
-
-    // main ray from the origin point to the curve point
-    hctx.strokeStyle = color;
-    hctx.lineWidth = 1;
-    hctx.beginPath();
-    hctx.moveTo(originX, originY);
-    hctx.lineTo(px, py);
-    hctx.stroke();
-
-    // small 8-point burst at the tip (like the turtle's forward/backward/right45 loop)
-    const burstLen = 5;
-    for(let k=0;k<8;k++){
-      const a = k * (Math.PI/4);
-      hctx.beginPath();
-      hctx.moveTo(px, py);
-      hctx.lineTo(px + Math.cos(a)*burstLen, py + Math.sin(a)*burstLen);
-      hctx.stroke();
-    }
-    hctx.shadowBlur = 0;
-
-    heartIndex++;
-  }, 75); // daha yavaş, tek tek belirsin
-}
-
 /* ================= ARDA BOT (Groq API) ================= */
 const GROQ_API_KEY = "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";
 const GROQ_MODEL = "openai/gpt-oss-120b";
@@ -693,55 +563,4 @@ async function sendArdaMessage(){
 
   appendChatLine(`<div id="ardaLoading" style="opacity:0.6;font-size:0.9rem;">Arda Bot yazıyor...</div>`);
 
-  try{
-    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "Authorization":"Bearer " + GROQ_API_KEY
-      },
-      body: JSON.stringify({
-        model: GROQ_MODEL,
-        messages: [
-          {role:"system", content: ARDA_SYSTEM_PROMPT},
-          ...ardaChatHistory
-        ]
-      })
-    });
-
-    const data = await res.json();
-    const loadingEl = document.getElementById('ardaLoading');
-    if(loadingEl) loadingEl.remove();
-
-    if(!res.ok){
-      const apiErr = (data && data.error && data.error.message) ? data.error.message : ("HTTP " + res.status);
-      appendChatLine(`<div style="margin-bottom:10px;color:#ff8a8a;">API hatası: ${escapeHtml(apiErr)}<br><span style="color:#3ddc84;font-size:0.85rem;">-Arda Bot</span></div>`);
-      return;
-    }
-
-    let reply = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content)
-      ? data.choices[0].message.content.trim()
-      : "Şu an cevap veremedim, birazdan tekrar dener misin?";
-
-    ardaChatHistory.push({role:"assistant", content:reply});
-
-    appendChatLine(`<div style="margin-bottom:10px;white-space:pre-wrap;">${escapeHtml(reply)}<br><span style="color:#3ddc84;font-size:0.85rem;">-Arda Bot</span></div>`);
-  }catch(err){
-    const loadingEl = document.getElementById('ardaLoading');
-    if(loadingEl) loadingEl.remove();
-    appendChatLine(`<div style="margin-bottom:10px;color:#ff8a8a;">Bağlantı hatası: ${escapeHtml(err.message || String(err))}<br><span style="color:#3ddc84;font-size:0.85rem;">-Arda Bot</span></div>`);
-  }
-}
-
-/* ================= BACKGROUND MUSIC ================= */
-const bgMusic=document.getElementById('bgMusic');
-const musicControl=document.getElementById('musicControl');
-function updateMusicButton(){const playing=!bgMusic.paused;musicControl.textContent=playing?'🔊':'🔇';musicControl.classList.toggle('off',!playing);musicControl.setAttribute('aria-label',playing?'Müziği kapat':'Müziği aç');}
-async function startMusic(){try{bgMusic.volume=.45;await bgMusic.play();}catch(e){}updateMusicButton();}
-musicControl.addEventListener('click',async e=>{e.stopPropagation();if(bgMusic.paused)await startMusic();else{bgMusic.pause();updateMusicButton();}});
-bgMusic.addEventListener('play',updateMusicButton);bgMusic.addEventListener('pause',updateMusicButton);startMusic();
-['pointerdown','keydown','touchstart'].forEach(evt=>document.addEventListener(evt,()=>{if(bgMusic.paused)startMusic();},{once:true,passive:true}));
-</script>
-
-</body>
-</html>
+  
